@@ -1,0 +1,20 @@
+{
+  "device": {"name": "tKeybd", "transport": "Bluetooth LE HID", "vendor_id": "0x248a", "product_id": "0x8266"},
+  "source": "macOS IOHIDManager observations, physical buttons identified by user, 2026-11-17",
+  "buttons": [
+    {"button": "up", "usage_page": "0x07", "usage": "0x52", "meaning": "Keyboard Up Arrow"},
+    {"button": "down", "usage_page": "0x07", "usage": "0x51", "meaning": "Keyboard Down Arrow"},
+    {"button": "left", "usage_page": "0x07", "usage": "0x50", "meaning": "Keyboard Left Arrow"},
+    {"button": "right", "usage_page": "0x07", "usage": "0x4f", "meaning": "Keyboard Right Arrow"},
+    {"button": "ok", "usage_page": "0x07", "usage": "0x58", "meaning": "Keypad Enter"},
+    {"button": "back", "usage_page": "0x07", "usage": "0x29", "meaning": "Keyboard Escape"},
+    {"button": "home", "usage_page": "0x0c", "usage": "0x0223", "meaning": "Consumer AC Home"},
+    {"button": "left_target_upper", "usage_page": "0x07", "usage": "0x41", "meaning": "Keyboard F8", "status": "user corrected physical position after test"},
+    {"button": "left_target_lower", "usage_page": "0x07", "usage": "0x42", "meaning": "Keyboard F9", "status": "user corrected physical position after test; observed twice"},
+    {"button": "right_plus", "usage_page": "0x0c", "usage": "0xe9", "meaning": "Consumer Volume Increment", "status": "confirmed after user corrected physical position"},
+    {"button": "right_minus", "usage_page": "0x0c", "usage": "0xea", "meaning": "Consumer Volume Decrement", "status": "confirmed repeatedly; user reports intermittent button actuation and indicator"},
+    {"button": "three_lines", "usage_page": "0x07", "usage": "0x65", "linux_key": "KEY_COMPOSE", "linux_scan_code": 127, "android_mapping": "MENU", "status": "user confirmed player menu works; distinct from Sony Quick Settings"},
+    {"button": "power", "status": "user confirmed native operation works without remapping; raw key code not captured"}
+  ],
+  "notes": ["Ignore usage 0xffffffff and array bookkeeping events for this table.", "Sony TV native direction, home, volume and overlay OK/Back/Menu behavior tested; native power operation confirmed by user. Sony Quick Settings remains unimplemented.", "HID product ID is a firmware identification clue, not proof of silicon model."]
+}

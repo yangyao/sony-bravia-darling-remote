@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.darling.keylayout" android:versionCode="1" android:versionName="1.0.0">
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="31" />
+    <application android:label="DARLING TV Keys" android:allowBackup="false" android:hasCode="true">
+        <receiver android:name=".LayoutsReceiver" android:exported="true" android:label="DARLING TV Keys">
+            <intent-filter>
+                <action android:name="android.hardware.input.action.QUERY_KEYBOARD_LAYOUTS" />
+            </intent-filter>
+            <meta-data android:name="android.hardware.input.metadata.KEYBOARD_LAYOUTS" android:resource="@xml/keyboard_layouts" />
+        </receiver>
+    </application>
+</manifest>

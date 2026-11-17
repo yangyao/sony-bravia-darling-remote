@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<keyboard-layouts xmlns:android="http://schemas.android.com/apk/res/android">
+    <keyboard-layout android:name="darling_tv" android:label="DARLING TV Keys" android:keyboardLayout="@raw/darling_tv" />
+</keyboard-layouts>

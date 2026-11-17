@@ -1,0 +1,10 @@
+type OVERLAY
+
+# Linux KEY_KPENTER -> Android DPAD_CENTER
+map key 96 DPAD_CENTER
+
+# Linux KEY_ESC -> Android BACK
+map key 1 BACK
+
+# Linux KEY_COMPOSE (HID Application/Menu) -> Android MENU
+map key 127 MENU

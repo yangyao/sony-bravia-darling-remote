@@ -1,0 +1,10 @@
+android-layout/build/
+__pycache__/
+*.pyc
+.DS_Store
+*.p12
+*.jks
+*.keystore
+*.bin
+*.log
+.serena/
