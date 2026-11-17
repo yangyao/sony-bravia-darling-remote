@@ -1,140 +1,82 @@
 # Sony BRAVIA × DARLING Remote
 
-Use a DARLING BLE remote directly with a Sony BRAVIA TV. An Android keyboard-layout APK fixes OK, Back and Menu, without root, an ESP32 bridge or a background remapping service.
+[English](README.en.md) | 简体中文
 
-讓 DARLING 藍牙遙控器直接控制 Sony BRAVIA 電視，透過一個鍵盤佈局 APK，補上原本無效的 **OK、返回、三橫線選單**。
+**给 Sony 电视换一只价格实在、金属机身的遥控器。**
 
-## 最後採用的方案
+家里有孩子，遥控器难免从沙发、桌子上掉下来。我买过的一些第三方 Sony 遥控器，塑料外壳很脆，摔几次就得换；反复买替代品很烦，又不想为原装遥控器花太多钱。
 
-```mermaid
-flowchart LR
-    Remote[DARLING 遙控器] -->|直接 BLE HID 配對| TV[Sony BRAVIA 電視]
-    Layout[已安裝的鍵盤佈局 APK] -->|由 Android 載入映射| TV
-```
+后来找到了一只价格较低、整体铝合金外壳的 DARLING 蓝牙遥控器。它不是 Sony 专用产品，但能直接和电视配对。这个项目把它缺少的按键适配补上，分享给同样想找一只金属机身、价格合适的电视遥控器的人。
 
-**日常使用不需要 ESP32、Mac、ADB 連線、無障礙服務或常駐按鍵轉換程式。** ADB 只用於初次安裝及選用佈局。前期曾用 ESP32-S3 掃描和嘗試連線，但它沒有參與最後的控制路徑。
+**蓝牙直连电视 · 原生电源与音量 · 补齐确认、返回和菜单 · 无需拆机或改装硬件**
 
-## 已測試環境
+## 为了少换几只遥控器
 
-| 項目 | 實機結果 |
-|---|---|
-| 電視 | Sony XR-65X90J，中國版 VH2 平台 |
-| 系統 | Android 12 / API 31；韌體 682241 |
-| 遙控器 | 金色 DARLING，鋰電池、Micro-USB 充電、激光筆；具體產品型號未知 |
-| 藍牙名稱 | Mac 顯示 `tKeybd`；電視顯示 `tKEY` |
-| HID 識別 | VID `0x248A` / PID `0x8266` |
+这是一套已经在家里使用的替代方案：保留实体按键的手感，换用铝合金机身，不必为了使用它再加一个转接盒或开发板。它尤其适合像我一样，家里有孩子、经常需要更换塑料遥控器，又希望控制预算的用户。
 
-僅在這組硬件與韌體上驗證，不代表所有 DARLING 或 Sony 型號通用。VID/PID 是固件回報值，**不能據此確認實際芯片型號**。
+仓库提供适配方法和安装包，方便已有这类遥控器、或正在寻找类似替代品的人使用。铝合金外壳是我选择它的原因；目前没有整机跌落测试，按键、电池和连接稳定性也需要实际检查。
 
-## 修正原因
+## 日常怎么用
 
-電視把這組 VID/PID 對應到 Google 參考遙控器配置：
+| 操作 | 当前状态 |
+| --- | --- |
+| 电源 | 已实测可直接使用，无需映射 |
+| 方向、首页、音量加减 | 原生可用 |
+| OK、返回 | 安装适配包后可用 |
+| 三横线菜单 | 安装适配包后，可打开播放器等应用的菜单 |
+| Sony 画面、声音快捷设置 | 尚未适配；与应用内菜单不同 |
+| 激光笔、左侧准星按键 | 不作为本项目的电视控制功能 |
 
-```text
-/system/usr/idc/Vendor_248a_Product_8266.idc
-keyboard.layout = Vendor_0957_Product_0001
-```
+例如播放影片时，三横线可以调出应用提供的选集、清晰度或字幕选项，具体内容由播放器决定。
 
-該配置缺少 DARLING 的數字鍵盤 Enter、Esc 和 Application/Menu 鍵。方向、首頁、音量正常，OK、返回和三橫線沒有相應操作。
+安装完成后，遥控器直接通过蓝牙控制电视。**日常不用开着电脑，也不需要 ESP32、后台映射服务或无障碍服务。**
 
-本專案提供 `type OVERLAY` 的 KCM，補上三行映射：
+## 什么设备已经试过
 
-```text
-map key 96 DPAD_CENTER
-map key 1 BACK
-map key 127 MENU
-```
+| 设备 | 已验证信息 |
+| --- | --- |
+| 电视 | Sony XR-65X90J，中国版 VH2 平台 |
+| 系统 | Android 12 / API 31，固件 682241 |
+| 遥控器 | 金色 DARLING，铝合金外壳、锂电池、Micro-USB 充电、激光笔 |
+| 蓝牙名称 | 电视上显示 `tKEY`，Mac 上显示 `tKeybd` |
 
-APK 只提供佈局資源，Android 輸入系統直接處理；沒有 Activity、後台 Service、網路權限或按鍵監聽服務。
+这只遥控器的具体产品型号仍未知，**不能只按品牌或外观认定同款兼容**。目前只验证了上面这一组设备；其他 Sony 电视、系统版本或外观相似的遥控器需要单独测试。
 
-## 按鍵實測
+## 开始使用
 
-| 實體按鍵 | HID Usage Page / Usage | 電視行為 |
-|---|---|---|
-| 上／下／左／右 | `07 / 52, 51, 50, 4F` | 原本即可使用 |
-| OK | `07 / 58`，Keypad Enter | 補成確認 `DPAD_CENTER` |
-| 返回 | `07 / 29`，Esc | 補成 `BACK` |
-| 首頁 | `0C / 0223`，AC Home | 原本即可使用 |
-| 右側＋／− | `0C / E9, EA` | 音量增加／減少 |
-| 左側準星上／下 | `07 / 41, 42`，F8／F9 | 已辨認；未新增功能 |
-| 電源旁三橫線 | `07 / 65`，Linux KEY_COMPOSE | 補成應用內 `MENU` |
-| 底部激光筆 | 測試期間未觀察到對應藍牙事件 | 目前無法在電視端映射 |
-| 電源 | 原始 HID 鍵碼未另外記錄 | 使用者已實測可直接使用，無需映射 |
+1. **先确认遥控器能连上电视。** 在电视的“添加配件”中配对；如已连接电脑，先断开。正确的专用配对组合键仍未确认。
+2. **下载并安装适配包。** 从 [Releases](https://github.com/yangyao/sony-bravia-darling-remote/releases) 下载 APK 和设置工具，按 [安装说明](docs/setup.md) 通过 ADB 安装并选用布局。需要一台电脑完成这一步，无需 root。
+3. **断开电脑，正常使用。** 测试确认、返回和应用菜单；已实测停止电脑上的临时转发程序后，这些功能仍然可用。
 
-**三橫線目前打開的是應用內選單**，例如播放器的選集、清晰度、字幕。它不是 Sony 的畫面／聲音「Quick Settings」快捷列；後者尚未實作。
+适配包只让 Android 直接识别这几个按键，不修改电视系统分区，不刷写遥控器固件。布局选择已保存，蓝牙重连后仍在；**整机重启后的保留情况尚未实测**。
 
-## 安裝
+[安装、卸载与自行编译 →](docs/setup.md)
 
-1. 先讓 DARLING 直接與電視配對。若已連 Mac 或其他主機，先斷開；測試用 ESP32 也應停止連線嘗試。
-2. 在電視啟用並授權 ADB，從電腦確認 `adb devices` 能看到它。
-3. 從 [Releases](../../releases) 下載 `darling-tv-layout.apk` 和 `layout-control.jar`，放到同一個目錄；或依下節自行建置。
-4. 保持遙控器已連線，執行：
+## 买之前，也看看这些实际问题
 
-```sh
-# SERIAL 是 adb devices 列出的裝置識別，例如電視 IP:5555。
-sh tools/install-layout.sh SERIAL /path/to/downloaded-files
-```
+这只样品曾出现蓝牙断连和休眠后重连不稳定，靠近电视、按首页后曾恢复；原因还没确定。音量减也曾出现按下不亮灯、没有响应的情况，后续又正常发出音量减事件，疑似接触不稳。
 
-若自行建置，第二個參數可省略，預設使用 `android-layout/build`。
+因此，这个项目解决的是**按键适配**，不能保证每一只旧遥控器的硬件状态或无线连接。建议先验证配对、常用距离下的连接、按键和电池状态，再把它作为家里的主遥控器。
 
-腳本會先讀取目前佈局、安裝 APK，再用一次性的 shell helper 選用新佈局。它會輸出 `BEFORE` 和 `AFTER`，便於保存原設定。**若 BEFORE 不是 null，先記下原佈局 ID。**
+## 为什么需要一个安装包
 
-安裝後斷開電腦的 ADB，測試 OK、返回與三橫線選單。不要只在 ADB 轉換程式仍運行時測試，否則會混淆結果。
-
-### 保留狀態
-
-- 已實測：停止 Mac 的按鍵轉換程式後，OK、返回仍正常。
-- 已實測：三橫線可打開播放器選單。
-- 使用者已實測：電源鍵可直接使用，不需新增映射。
-- 已觀察：藍牙斷開重連後，已選用的佈局仍在。
-- 系統會儲存佈局選擇，預期重啟後保留；**本次尚未完成整機重啟驗證**。
-- 不要卸載佈局 APK，否則系統會失去這份資源。
-
-## 自行建置
-
-需要 JDK（支援 `javac --release 8`）、Android SDK Platform 34、Build Tools 35.0.1，以及 `zip`。
-
-```sh
-export JAVA_HOME=/path/to/jdk
-export ANDROID_SDK_ROOT=/path/to/android-sdk
-sh android-layout/build.sh
-```
-
-產物：
+这只遥控器原本就会发送标准蓝牙 HID 按键，但测试电视为它选择的系统配置遗漏了 OK、返回和菜单。一个很小的键盘布局 APK 就能补上：
 
 ```text
-android-layout/build/darling-tv-layout.apk
-android-layout/build/layout-control.jar
+DARLING 遥控器 ──蓝牙 HID──► Sony BRAVIA
+                              Android 系统加载按键布局
 ```
 
-可用 `DARLING_BUILD_TOOLS`、`DARLING_ANDROID_JAR`、`DARLING_JAVA_BIN` 覆寫工具路徑。首次建置會在忽略的 `build/` 中建立本地簽名金鑰；後續更新請沿用同一把金鑰。此金鑰使用公開的開發用密碼，僅供本地／此專案 APK 簽名，不應用於其他正式產品。
+无需在两者之间接 ESP32。ESP32-S3 只在早期探索中用于扫描和连接测试，没有参与最终控制方案。详细按键和排查过程见 [调查记录](docs/investigation.md) 与 [按键数据](docs/keymap.json)。
 
-若自行簽名的 APK 與已安裝版本簽名不同，需要先移除舊版本，再安裝並重新選用佈局。
+## 项目结构
 
-## 還原
+| 目录 | 内容 |
+| --- | --- |
+| `android-layout/` | 确认、返回和菜单布局 APK，以及一次性设置工具 |
+| `tools/` | 安装、还原脚本及 Mac HID 调查工具 |
+| `docs/` | 中英文安装说明、调查记录和按键数据 |
 
-遙控器保持連線，執行：
+## 许可证
 
-```sh
-sh tools/remove-layout.sh SERIAL /path/to/downloaded-files
-```
-
-這會移除本專案的佈局選擇並卸載 APK，不修改 `/system`。若安裝前有其他自訂佈局，請依保存的 BEFORE ID 重新選回；本次測試電視的初始值是 `null`。
-
-## 已知限制
-
-- 遙控器曾發生連線逾時、休眠後重連不穩；靠近電視、按首頁後曾恢復。原因未確定，不能把所有斷線都視為正常省電。映射套件不會修復無線連線。
-- 音量減曾間歇無反應、指示燈不亮；後續收到標準音量減事件，疑似按鍵接觸不穩，未拆機確認。
-- 正確配對組合鍵仍未知；「返回＋首頁五秒」未獲得確定效果，激光鍵是否影響配對也未證實。
-- Android 14 等其他系統的佈局 API 及套用條件可能不同；此 helper 以 Android 12 為目標。
-- Sony Quick Settings 尚未完成；電源鍵已由使用者確認原生可用。
-
-更多測試過程見 [調查紀錄](docs/investigation.md)。本倉庫不含原廠固件、個人裝置地址、區網 IP、簽名私鑰或電視觀看畫面。
-
-## 參考
-
-- [AOSP Android 12：鍵盤佈局選擇、載入與保存](https://android.googlesource.com/platform/frameworks/base/+/android-12.0.0_r1/services/core/java/com/android/server/input/InputManagerService.java)
-- [AOSP：Key Character Map 解析實作](https://android.googlesource.com/platform/frameworks/native/+/android-12.0.0_r1/libs/input/KeyCharacterMap.cpp)
-- [Sony X90J：Quick Settings 說明](https://www.sony.com/electronics/support/televisions-projectors-lcd-tvs-android-/xr-65x90j/articles/00225435)
-
-MIT 授權。本專案與 Sony、DARLING 無隸屬關係。
+[MIT](LICENSE)。本项目与 Sony、DARLING 无隶属关系。
